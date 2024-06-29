@@ -1,61 +1,48 @@
 import pygame
 import random
-from settings import ENEMY_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, BULLET_COOLDOWN
-from bullet import Bullet
+from settings import ENEMY_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, game_map):
+    def __init__(self, x, y, direction, obstacles_group):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((255, 0, 0))  # червоний квадрат
+        self.image_up = pygame.image.load('C:\\Users\\nikit\\OneDrive\\Робочий стіл\\2d-battle-city-main\\2d\\enemy_up.png').convert_alpha()
+        self.image_down = pygame.image.load('C:\\Users\\nikit\\OneDrive\\Робочий стіл\\2d-battle-city-main\\2d\\enemy_down.png').convert_alpha()
+        self.image_left = pygame.image.load('C:\\Users\\nikit\\OneDrive\\Робочий стіл\\2d-battle-city-main\\2d\\enemy_left.png').convert_alpha()
+        self.image_right = pygame.image.load('C:\\Users\\nikit\\OneDrive\\Робочий стіл\\2d-battle-city-main\\2d\\enemy_right.png').convert_alpha()
+
+
+        self.image = self.image_down  # Початкове зображення - вниз
+        
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.direction = random.choice(['left', 'right', 'up', 'down'])
-        self.change_direction_time = pygame.time.get_ticks()
-        self.last_shot_time = pygame.time.get_ticks()
-        self.game_map = game_map
-
+        self.direction = direction
+        self.obstacles_group = obstacles_group  # Група перешкод
+        pygame.transform.scale
     def update(self):
-        now = pygame.time.get_ticks()
-        if now - self.change_direction_time > 1000:
-            self.direction = random.choice(['left', 'right', 'up', 'down'])
-            self.change_direction_time = now
-
-        if now - self.last_shot_time > BULLET_COOLDOWN:
-            self.shoot()
-            self.last_shot_time = now
-
-        self.move()
-
-    def move(self):
-        old_rect = self.rect.copy()
-
         if self.direction == 'left':
+            self.image = self.image_left
             self.rect.x -= ENEMY_SPEED
         elif self.direction == 'right':
+            self.image = self.image_right
             self.rect.x += ENEMY_SPEED
         elif self.direction == 'up':
+            self.image = self.image_up
             self.rect.y -= ENEMY_SPEED
         elif self.direction == 'down':
+            self.image = self.image_down
             self.rect.y += ENEMY_SPEED
 
-        if pygame.sprite.spritecollideany(self, self.game_map.obstacles):
-            self.rect = old_rect
-            self.direction = random.choice(['left', 'right', 'up', 'down'])
+        # Перевірка колізій з перешкодами
+        self.check_collision()
 
-        if self.rect.left < 0:
-            self.rect.left = 0
-            self.direction = random.choice(['right', 'up', 'down'])
-        if self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
-            self.direction = random.choice(['left', 'up', 'down'])
-        if self.rect.top < 0:
-            self.rect.top = 0
-            self.direction = random.choice(['left', 'right', 'down'])
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
-            self.direction = random.choice(['left', 'right', 'up'])
+    def check_collision(self):
+        obstacles_hit = pygame.sprite.spritecollide(self, self.obstacles_group, False)
+        
+        for obstacle in obstacles_hit:
+            # Виконати дії в разі зіткнення
+            # Наприклад, змінити напрямок руху ворога
+            self.change_direction()
 
-    def shoot(self):
-        bullet = Bullet(self.rect.centerx, self.rect.centery, self.direction, self)
-        self.game_map.bullets.add(bullet)
+    def change_direction(self):
+        # Реалізуйте зміну напрямку руху ворога
+        self.direction = random.choice(['left', 'right', 'up', 'down'])
