@@ -1,11 +1,17 @@
+# settings.py
+
+# Розмір екрану
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-
+# Швидкість гравця
 PLAYER_SPEED = 5
-ENEMY_SPEED = 3
+
+# Швидкість кулі
 BULLET_SPEED = 10
-BULLET_COOLDOWN = 3000  
+
+# Швидкість ворога
+ENEMY_SPEED = 2
+
+# Інші налаштування
+BLACK = (0, 0, 0)
